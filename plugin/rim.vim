@@ -1,10 +1,10 @@
 " setup things
-:command Rim call s:startRim(g:DEFAULT_TERM)
-:command Jim call s:startRim(g:JULIA_TERM)
+:command Rim call s:startRim(g:DEFAULT_TERM) :command Jim call s:startRim(g:JULIA_TERM)
 :command Pim call s:startRim(g:PYTHON_TERM)
 :command RW call s:rimWipe(g:CURRENT_TERM)
 :command RR call s:rimRestart()
-:command EF call s:executeFile(g:CURRENT_TERM)
+:command EF call s:executeBuffer(g:CURRENT_TERM)
+:command -nargs=* EB call s:executeBuffer(g:CURRENT_TERM, <f-args>) " execute given list of buffers
 :command -range ES call s:executeSelection(s:get_visual_selection())
 :command EL call s:executeSelection(getline("."))
 
@@ -61,22 +61,38 @@ function! s:rimRestart()
     call s:startRim(l:currTerm)
 endfunction
 
-function! s:executeFile(termType)
+function! s:executeFile(termType, file)
     if s:checkTerm()
         if a:termType == g:DEFAULT_TERM
-            call term_sendkeys(bufnr(g:CURRENT_TERM), "./" . @% . "\<cr>")
+            call term_sendkeys(bufnr(g:CURRENT_TERM), "./" . a:file . "\<cr>")
             return
         endif
 
         if a:termType == g:JULIA_TERM
-            call term_sendkeys(bufnr(g:CURRENT_TERM), "include(\"" . @% . "\")\<cr>")
+            call term_sendkeys(bufnr(g:CURRENT_TERM), "include(\"" . a:file . "\")\<cr>")
             return
         endif
 
         if a:termType == g:PYTHON_TERM
-            call term_sendkeys(bufnr(g:CURRENT_TERM), "exec(open(\"" . @% . "\").read(), globals())\<cr>")
+            call term_sendkeys(bufnr(g:CURRENT_TERM), "exec(open(\"" . a:file . "\").read(), globals())\<cr>")
         endif
     endif
+endfunction
+
+function! s:executeBuffer(termType, ...)
+    if s:checkTerm()
+        if a:0 == 0
+            call s:executeFile(a:termType, @%)
+        else
+            for bn in a:000
+                call s:executeFile(a:termType, s:getFilePathFromBuffer(bn))
+            endfor
+        endif
+    endif
+endfunction
+
+function! s:getFilePathFromBuffer(bufferNum)
+    return expand("#" . a:bufferNum . ":p")
 endfunction
 
 function! s:get_visual_selection() " credits to https://stackoverflow.com/a/6271254
