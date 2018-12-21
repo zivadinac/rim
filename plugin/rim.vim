@@ -14,6 +14,8 @@ let g:JULIA_TERM = "julia"
 let g:PYTHON_TERM = "python"
 let g:SUPPORTED_TERMS = [g:DEFAULT_TERM, g:JULIA_TERM, g:PYTHON_TERM]
 
+let g:RUN_TERM_CMD = "vert term "
+
 function! s:startRim(termType)
     if g:CURRENT_TERM == ""
         if count(g:SUPPORTED_TERMS, a:termType) == 0
@@ -24,9 +26,9 @@ function! s:startRim(termType)
         call s:setCurrentTerm(a:termType)
 
         if a:termType == g:DEFAULT_TERM
-            :terminal
+            execute(g:RUN_TERM_CMD)
         else
-            execute ("term " . a:termType)
+            execute (g:RUN_TERM_CMD . a:termType)
         endif
 
         execute ("file " . a:termType)
