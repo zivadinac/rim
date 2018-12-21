@@ -1,12 +1,13 @@
 " setup things
-:command Rim call s:startRim(g:DEFAULT_TERM) :command Jim call s:startRim(g:JULIA_TERM)
+:command Rim call s:startRim(g:DEFAULT_TERM)
+:command Jim call s:startRim(g:JULIA_TERM)
 :command Pim call s:startRim(g:PYTHON_TERM)
 :command RW call s:rimWipe(g:CURRENT_TERM)
 :command RR call s:rimRestart()
-:command EF call s:executeBuffer(g:CURRENT_TERM)
-:command -nargs=* EB call s:executeBuffer(g:CURRENT_TERM, <f-args>) " execute given list of buffers
+:command EF call s:executeBuffers(g:CURRENT_TERM)
+:command -nargs=* EB call s:executeBuffers(g:CURRENT_TERM, <f-args>) " execute given list of buffers
 :command -range ES call s:executeSelection(s:get_visual_selection())
-:command EL call s:executeSelection(getline("."))
+:command EL call s:executeSelection(getline(".")) " execute line
 
 let g:CURRENT_TERM = ""
 let g:DEFAULT_TERM = "bash"
@@ -37,19 +38,6 @@ function! s:startRim(termType)
     endif
 endfunction
 
-function! s:setCurrentTerm(termType)
-    let g:CURRENT_TERM = a:termType
-endfunction
-
-function! s:checkTerm()
-    if g:CURRENT_TERM == ""
-        echo "No terminal opened."
-        return 0
-    endif
-
-    return 1
-endfunction
-
 function! s:rimWipe(termType)
     execute ("bw! " . a:termType)
     call s:setCurrentTerm("")
@@ -60,6 +48,26 @@ function! s:rimRestart()
     call s:rimWipe(g:CURRENT_TERM)
     call s:startRim(l:currTerm)
 endfunction
+
+function! s:executeBuffers(termType, ...)
+    if s:checkTerm()
+        if a:0 == 0
+            call s:executeFile(a:termType, @%)
+        else
+            for bn in a:000
+                call s:executeFile(a:termType, s:getFilePathFromBuffer(bn))
+            endfor
+        endif
+    endif
+endfunction
+
+function! s:executeSelection(selection)
+    if s:checkTerm()
+        call term_sendkeys(bufnr(g:CURRENT_TERM), a:selection . "\<cr>")
+    endif
+endfunction
+
+" utility functions
 
 function! s:executeFile(termType, file)
     if s:checkTerm()
@@ -79,18 +87,18 @@ function! s:executeFile(termType, file)
     endif
 endfunction
 
-function! s:executeBuffer(termType, ...)
-    if s:checkTerm()
-        if a:0 == 0
-            call s:executeFile(a:termType, @%)
-        else
-            for bn in a:000
-                call s:executeFile(a:termType, s:getFilePathFromBuffer(bn))
-            endfor
-        endif
-    endif
+function! s:setCurrentTerm(termType)
+    let g:CURRENT_TERM = a:termType
 endfunction
 
+function! s:checkTerm()
+    if g:CURRENT_TERM == ""
+        echo "No terminal opened."
+        return 0
+    endif
+
+    return 1
+endfunction
 function! s:getFilePathFromBuffer(bufferNum)
     return expand("#" . a:bufferNum . ":p")
 endfunction
@@ -106,10 +114,4 @@ function! s:get_visual_selection() " credits to https://stackoverflow.com/a/6271
     let lines[-1] = lines[-1][: column_end - (&selection == 'inclusive' ? 1 : 2)]
     let lines[0] = lines[0][column_start - 1:]
     return join(lines, "\n")
-endfunction
-
-function! s:executeSelection(selection)
-    if s:checkTerm()
-        call term_sendkeys(bufnr(g:CURRENT_TERM), a:selection . "\<cr>")
-    endif
 endfunction
