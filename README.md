@@ -16,6 +16,3 @@ Rim currently supports default shell, Python shell and Julia shell.
 * **:RW**  - close terminal
 * **:RR** - restart terminal
 
-## TODO
-
-* Add docs

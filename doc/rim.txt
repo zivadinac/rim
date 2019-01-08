@@ -1,0 +1,37 @@
+*rim*   Simple plugin for REPL-style work in Vim. In order to use it, Vim must
+be compiled with terminal option.
+
+================================================================================
+USAGE                                                                      *rim*
+
+Rim currently supports default shell, Python shell and Julia shell.
+
+================================================================================
+STARTING                                                                   *Rim*
+
+:Rim                                                                       *:Rim*
+    start terminal with default shell
+
+:Pim                                                                       *:Pim*
+    start terminal with Python shell
+
+:Jim                                                                       *:Jim*
+    start terminal with Julia shell
+  
+================================================================================
+OPTIONS
+
+:EF                                                                        *:EF*
+    execute current file
+:EB                                                                        *:EB*
+    execute given buffers (execute current buffer if called without parameters)
+:EL                                                                        *:EL*
+    execute current line
+:ES                                                                        *:ES*
+    execute selected text
+:RW                                                                        *:RW*
+    close terminal
+:RR                                                                        *:RR*
+    restart terminal
+
+ vim:tw=78:fo=tcq2:ft=help:norl:
