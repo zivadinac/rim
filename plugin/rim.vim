@@ -7,7 +7,7 @@
 :command EF call s:executeBuffers(g:CURRENT_TERM)
 :command -nargs=* EB call s:executeBuffers(g:CURRENT_TERM, <f-args>) " execute given list of buffers
 :command -range ES call s:executeSelection(s:get_visual_selection())
-:command EL call s:executeSelection(getline(".")) " execute line
+:command -nargs=* EL call s:executeLine(<f-args>) " execute given lines
 
 let g:CURRENT_TERM = ""
 let g:DEFAULT_TERM = "bash"
@@ -67,6 +67,18 @@ function! s:executeSelection(selection)
     endif
 endfunction
 
+function! s:executeLine(...)
+    if s:checkTerm()
+        if a:0 == 0
+            call s:executeSelection(getline("."))
+        else
+            for ln in a:000
+                call s:executeSelection(getline(ln))
+            endfor
+        endif
+    endif
+endfunction
+
 " utility functions
 
 function! s:executeFile(termType, file)
@@ -99,6 +111,7 @@ function! s:checkTerm()
 
     return 1
 endfunction
+
 function! s:getFilePathFromBuffer(bufferNum)
     return expand("#" . a:bufferNum . ":p")
 endfunction

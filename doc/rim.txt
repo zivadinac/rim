@@ -26,7 +26,7 @@ OPTIONS
 :EB                                                                        *:EB*
     execute given buffers (execute current buffer if called without parameters)
 :EL                                                                        *:EL*
-    execute current line
+    execute given lines (execute current line if called without parameters)
 :ES                                                                        *:ES*
     execute selected text
 :RW                                                                        *:RW*

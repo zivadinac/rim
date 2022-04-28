@@ -11,8 +11,8 @@ Rim currently supports default shell, Python shell and Julia shell.
   
 * **:EF** - execute current file
 * **:EB** - execute given buffers (execute current buffer if called without parameters)
-* **:EL** - execute current line
+* **:EL** - execute given lines (execute current line if called without parameters)
 * **:ES** - execute selected text
-* **:RW**  - close terminal
+* **:RW** - close terminal
 * **:RR** - restart terminal
 
