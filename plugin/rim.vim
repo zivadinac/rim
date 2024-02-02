@@ -63,7 +63,26 @@ endfunction
 
 function! s:executeSelection(selection)
     if s:checkTerm()
-        call term_sendkeys(bufnr(g:CURRENT_TERM), a:selection . "\<cr>")
+        if g:CURRENT_TERM == g:PYTHON_TERM
+            let l:slc = s:preprocessPythonSelection(a:selection)
+        else
+            let l:slc = a:selection
+        endif
+        call term_sendkeys(bufnr(g:CURRENT_TERM), l:slc . "\<cr>")
+    endif
+endfunction
+
+function! s:preprocessPythonSelection(selection)
+    " correct indent by moving the selection to the level zero -
+    " - e.g. first line not indented
+    " assumes uniform indent characters - either tabs or whitespaces
+    let l:leading_ws = matchstr(a:selection, "^[\ \t]*")
+    let l:ws_len = len(l:leading_ws)
+    if l:ws_len > 0
+         let l:trimmed = substitute(a:selection, l:leading_ws, "", "")
+         return substitute(l:trimmed, "\n" . l:leading_ws, "\n", "g")
+    else
+        return a:selection
     endif
 endfunction
 
